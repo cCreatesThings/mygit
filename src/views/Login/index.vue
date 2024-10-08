@@ -84,7 +84,6 @@ const handleLogin = async () => {
   flex: 1;
   background-color: #000;
   color: #fff;
-  padding: 2rem;
   position: relative;
   overflow: hidden;
 }
