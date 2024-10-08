@@ -2,23 +2,30 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import left_codewave from '@/assets/images/logo-codewave.png'
-
+import { postOAuthTokenAPI } from '@/api/login'
+const formRef = ref()
 const form = ref({
-  username: '',
-  password: '',
+  username: '3530812934@qq.com',
+  password: 'Ljt1527111',
   agreement: false
 })
-
-const handleLogin = () => {
-  if (!form.value.username || !form.value.password) {
-    ElMessage.error('请输入账号和密码')
-    return
-  }
-  if (!form.value.agreement) {
-    ElMessage.error('请同意服务协议和隐私政策')
-    return
-  }
-  // Implement login logic here
+const rules = {
+  username: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    {
+      pattern: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+      message: '请输入正确的邮箱格式',
+      trigger: 'blur'
+    }
+  ],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
+}
+const handleLogin = async () => {
+  const isOK = await formRef.value.validate()
+  if (!isOK) return ElMessage.error('请输入正确的邮箱和密码')
+  if (!form.value.agreement) return ElMessage.error('请勾选服务协议和隐私政策')
+  const res = await postOAuthTokenAPI(form.value)
+  console.log(res)
   ElMessage.success('登录成功')
 }
 </script>
@@ -30,11 +37,11 @@ const handleLogin = () => {
     <div class="right-panel">
       <el-card>
         <h2 class="login-title">登录，即刻创造您的应用</h2>
-        <el-form :model="form" class="login-form">
-          <el-form-item>
-            <el-input v-model="form.username" placeholder="账号" />
+        <el-form :rules="rules" :model="form" ref="formRef" class="login-form">
+          <el-form-item prop="username">
+            <el-input type="email" v-model="form.username" placeholder="账号" />
           </el-form-item>
-          <el-form-item>
+          <el-form-item prop="password">
             <el-input
               v-model="form.password"
               type="password"
