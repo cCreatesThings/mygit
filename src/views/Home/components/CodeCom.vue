@@ -10,7 +10,7 @@ const comObj = {
   all: AllCom,
   opensource: OpensourceCom
 }
-const activeTab = ref('rencent')
+const activeTab = ref('all')
 </script>
 
 <template>
