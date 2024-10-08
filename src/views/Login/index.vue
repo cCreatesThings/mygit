@@ -37,7 +37,7 @@ const handleLogin = async () => {
 <template>
   <div class="login-container">
     <div class="left-panel">
-      <img :src="left_codewave" alt="Codewave Logo" class="logo" />
+      <el-image :src="left_codewave" alt="Codewave Logo" class="logo" />
     </div>
     <div class="right-panel">
       <el-card>
@@ -92,7 +92,7 @@ const handleLogin = async () => {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 2rem;
+  /* margin-bottom: 2rem; */
 }
 
 .logo {
