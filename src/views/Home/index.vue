@@ -7,7 +7,7 @@ const sidebarItems = [
   { icon: 'mdi:folder-outline', label: '项目', path: '/project' },
   { icon: 'mdi:robot-outline', label: 'AI', path: '/ai' },
   { icon: 'mdi:file-document-outline', label: '事项', path: '/task' },
-  { icon: 'mdi:code-braces', label: '代码', path: '/code' },
+  { icon: 'mdi:code-braces', label: '代码', path: '/' },
   { icon: 'mdi:cube-outline', label: '制品', path: '/artifact' },
   { icon: 'mdi:chart-line', label: '洞察', path: '/insight' },
   { icon: 'mdi:book-open-outline', label: '知识', path: '/knowledge' },
