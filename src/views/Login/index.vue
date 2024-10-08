@@ -3,10 +3,14 @@ import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import left_codewave from '@/assets/images/logo-codewave.png'
 import { postOAuthTokenAPI } from '@/api/login'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
+const userStore = useUserStore()
+const router = useRouter()
 const formRef = ref()
 const form = ref({
   username: '3530812934@qq.com',
-  password: 'Ljt1527111',
+  password: 'ljt1527111',
   agreement: false
 })
 const rules = {
@@ -25,8 +29,9 @@ const handleLogin = async () => {
   if (!isOK) return ElMessage.error('请输入正确的邮箱和密码')
   if (!form.value.agreement) return ElMessage.error('请勾选服务协议和隐私政策')
   const res = await postOAuthTokenAPI(form.value)
-  console.log(res)
+  userStore.setProfile(res)
   ElMessage.success('登录成功')
+  setTimeout(() => router.push('/'), 1500)
 }
 </script>
 <template>
