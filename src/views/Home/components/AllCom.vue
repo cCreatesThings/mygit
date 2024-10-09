@@ -44,16 +44,17 @@
 
 <script setup>
 import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
 import png from '@/assets/images/4.png'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const createRepoImage = ref(png)
 const mergeRequestImage = ref(png)
 const codeVersionImage = ref(png)
 
 const createRepository = () => {
-  ElMessage.success('正在创建代码仓库...')
-  // Implement repository creation logic here
+  router.push('/create')
 }
 </script>
 

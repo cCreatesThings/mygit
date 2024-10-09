@@ -12,6 +12,12 @@ const router = createRouter({
           path: '',
           name: 'code',
           component: () => import('@/views/Home/components/CodeCom.vue')
+        },
+        {
+          path: 'create',
+          name: 'create',
+          component: () =>
+            import('@/views/Home/components/CreateRepository.vue')
         }
       ]
     },

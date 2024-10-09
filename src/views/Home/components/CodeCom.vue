@@ -20,7 +20,12 @@ const activeTab = ref('all')
       <el-tab-pane label="全部仓库" name="all"></el-tab-pane>
       <el-tab-pane label="开源仓库" name="opensource"></el-tab-pane>
     </el-tabs>
-    <el-button type="primary" class="create-repo-btn">创建代码仓库</el-button>
+    <el-button
+      type="primary"
+      class="create-repo-btn"
+      @click="$router.push('/create')"
+      >创建代码仓库</el-button
+    >
   </div>
   <div class="repo-content">
     <component :is="comObj[activeTab]" v-if="true" />
