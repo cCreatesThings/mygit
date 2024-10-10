@@ -19,7 +19,6 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   (response) => {
     // 错误响应处理
-    console.log(response)
     if (response.status < 200 || response.status >= 300) {
       ElMessage.error(response.data.error_description || '业务异常')
       return Promise.reject(response.data)
@@ -27,6 +26,11 @@ request.interceptors.response.use(
     return response.data
   },
   (err) => {
+    // 401处理
+    if (err.response.status === 401) {
+      ElMessage.error('登录过期，请重新登录')
+      return Promise.reject(err)
+    }
     ElMessage.error(err.response.data.error_description || '业务异常')
     return Promise.reject(err)
   }

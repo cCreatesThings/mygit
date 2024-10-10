@@ -1,5 +1,179 @@
+<script setup>
+import png from '@/assets/images/4.png'
+import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+import { Icon } from '@iconify/vue'
+import { ElMessage } from 'element-plus'
+import { getUserAllReposAPI } from '@/api/repo'
+
+const filters = ref({
+  project: '',
+  visibility: 'all',
+  archived: ''
+  // per_page: 10,
+  // page: 1
+})
+// 首次进入页面, 获取全部仓库
+const getUserAllRepos = async () => {
+  const res = await getUserAllReposAPI(filters.value)
+  repositories.value = res
+  handlePageChange(1)
+}
+getUserAllRepos()
+// 点击搜索
+const search = () => {
+  console.log(filters.value)
+}
+
+const repositories = ref([
+  // Add more repository data as needed
+])
+const paginatedRepositories = ref([])
+
+// const currentPage = ref(1)
+// const pageSize = ref(10)
+
+// const handleSizeChange = (val) => {
+//   pageSize.value = val
+//   currentPage.value = 1
+// }
+
+const handlePageChange = (val) => {
+  console.log((val - 1) * 5, (val - 1) * 5 + 5)
+  paginatedRepositories.value = repositories.value.slice(
+    (val - 1) * 5,
+    (val - 1) * 5 + 5
+  )
+}
+
+const handleSort = (command) => {
+  ElMessage.success(`Sorting by ${command}`)
+  // Implement sorting logic here
+}
+
+const starRepo = (repo) => {
+  ElMessage.success(`Starred repository: ${repo.name}`)
+  // Implement star logic here
+}
+
+const showSettings = (repo) => {
+  ElMessage.info(`Showing settings for repository: ${repo.name}`)
+  // Implement settings display logic here
+}
+
+const router = useRouter()
+
+const createRepoImage = ref(png)
+const mergeRequestImage = ref(png)
+const codeVersionImage = ref(png)
+
+const createRepository = () => {
+  router.push('/create')
+}
+</script>
+
 <template>
-  <div class="welcome-page">
+  <div class="repository-list" v-if="true">
+    <div class="top">
+      <div class="filters">
+        <el-select v-model="filters.project" placeholder="所属项目" clearable>
+          <el-option label="全部项目" value=""></el-option>
+          <el-option label="项目1" value="1"></el-option>
+          <el-option label="项目2" value="2"></el-option>
+        </el-select>
+        <el-select v-model="filters.visibility" placeholder="公开性" clearable>
+          <el-option label="全部" value="all"></el-option>
+          <el-option label="公开" value="public"></el-option>
+          <el-option label="私有" value="private"></el-option>
+        </el-select>
+        <el-select v-model="filters.archived" placeholder="归档状态" clearable>
+          <el-option label="全部" value=""></el-option>
+          <el-option label="已归档" value="true"></el-option>
+          <el-option label="未归档" value="false"></el-option>
+        </el-select>
+        <el-button @click="search">
+          <template #icon>
+            <Icon icon="mdi:magnify" />
+          </template>
+          搜索
+        </el-button>
+      </div>
+
+      <div class="table-header">
+        <div class="sort-options">
+          <span>排序字段</span>
+          <el-dropdown @command="handleSort">
+            <span class="el-dropdown-link">
+              仓库名称
+              <Icon icon="mdi:chevron-down" />
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="name">仓库名称</el-dropdown-item>
+                <el-dropdown-item command="project">所属项目</el-dropdown-item>
+                <el-dropdown-item command="updatedAt"
+                  >更新时间</el-dropdown-item
+                >
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
+      </div>
+    </div>
+
+    <el-table :data="paginatedRepositories" style="width: 100%">
+      <el-table-column label="仓库名称" prop="name">
+        <template #default="scope">
+          <div class="repo-info">
+            <el-avatar :size="32" :src="scope.row.avatar">{{
+              scope.row.name.charAt(0).toUpperCase()
+            }}</el-avatar>
+            <div class="repo-details">
+              <div class="repo-name">{{ scope.row.name }}</div>
+              <div class="repo-description">{{ scope.row.description }}</div>
+            </div>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="所属项目" prop="project">
+        <template #default="{ row }">
+          {{ row.human_name }}
+        </template>
+      </el-table-column>
+      <el-table-column label="合并请求" prop="mergeRequests">
+        <template #default="scope">
+          <Icon icon="mdi:source-merge" /> {{ scope.row.mergeRequests }}
+        </template>
+      </el-table-column>
+      <el-table-column label="更新时间" prop="updatedAt">
+        <template #default="{ row }">
+          {{ new Date(row.updated_at).toLocaleString() }}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="100">
+        <template #default="scope">
+          <el-button type="text" @click="starRepo(scope.row)">
+            <Icon icon="mdi:star-outline" />
+          </el-button>
+          <el-button type="text" @click="showSettings(scope.row)">
+            <Icon icon="mdi:cog" />
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <div class="pagination">
+      <el-pagination
+        layout="prev, pager, next"
+        :total="repositories.length"
+        :pager-count="5"
+        :page-size="5"
+        @current-change="handlePageChange"
+      />
+      <span>共{{ repositories.length }}个仓库</span>
+    </div>
+  </div>
+  <div class="welcome-page" v-else>
     <h1 class="welcome-title">欢迎使用代码仓库</h1>
     <p class="welcome-description">
       代码仓库用于托管基于 GIT 或 SVN 管理的代码库。通过 Review
@@ -42,23 +216,70 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import png from '@/assets/images/4.png'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-
-const createRepoImage = ref(png)
-const mergeRequestImage = ref(png)
-const codeVersionImage = ref(png)
-
-const createRepository = () => {
-  router.push('/create')
-}
-</script>
-
 <style scoped>
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.repository-list {
+  padding: 20px;
+  width: 80%;
+}
+
+.filters {
+  width: 50%;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.sort-options {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.el-dropdown-link {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.repo-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.repo-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.repo-name {
+  font-weight: bold;
+}
+
+.repo-description {
+  font-size: 12px;
+  color: #666;
+}
+
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
 .welcome-page {
   max-width: 800px;
   padding: 40px 20px;

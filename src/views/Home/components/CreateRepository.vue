@@ -3,7 +3,7 @@ import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Document } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
-import { postCreateRepositoryAPI } from '@/api/create'
+import { postCreateRepositoryAPI } from '@/api/repo'
 
 const router = useRouter()
 
