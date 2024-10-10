@@ -3,23 +3,26 @@ import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Document } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
+import { postCreateRepositoryAPI } from '@/api/create'
 
 const router = useRouter()
 
 const formRef = ref(null)
+const isGitignore = ref(false)
 
 const form = reactive({
   project: '',
   repoType: 'GIT',
-  repoName: '',
+  name: '',
   description: '',
   initOptions: [],
-  isPublic: false
+  gitignore_template: isGitignore.value ? '' : 'Node',
+  auto_init: false,
+  private: true
 })
 
 const rules = {
-  project: [{ required: true, message: '请选择所属项目', trigger: 'change' }],
-  repoName: [
+  name: [
     { required: true, message: '请输入仓库名称', trigger: 'blur' },
     {
       pattern: /^[\u4e00-\u9fa5a-zA-Z0-9_.-]+$/,
@@ -36,13 +39,14 @@ const goBack = () => {
 const submitForm = async () => {
   if (!formRef.value) return
 
-  await formRef.value.validate((valid, fields) => {
+  await formRef.value.validate(async (valid) => {
     if (valid) {
-      console.log('Form submission:', form)
       ElMessage.success('仓库创建成功')
-      // Implement form submission logic here
+      const res = await postCreateRepositoryAPI(form)
+      console.log(res)
+      router.push('/') // 重置表单
+      formRef.value.resetFields()
     } else {
-      console.log('Form validation failed:', fields)
       ElMessage.error('请填写所有必填字段')
     }
   })
@@ -65,25 +69,25 @@ const resetForm = () => {
       label-position="top"
       class="repo-form"
     >
-      <el-form-item label="所属项目" prop="project" required>
+      <el-form-item label="所属项目" prop="project">
         <el-select v-model="form.project" placeholder="所属项目">
           <el-option label="项目1" value="project1" />
           <el-option label="项目2" value="project2" />
         </el-select>
       </el-form-item>
 
-      <el-form-item label="仓库类型和名称" required>
+      <el-form-item label="仓库类型和名称" required prop="name">
         <div class="repo-type-name">
           <div class="repo-type">
             <el-radio-group v-model="form.repoType">
-              <el-radio-button label="GIT">
+              <el-radio-button value="GIT">
                 <el-icon><Document /></el-icon> GIT 仓库
               </el-radio-button>
             </el-radio-group>
           </div>
           <el-input
             style="width: 700px"
-            v-model="form.repoName"
+            v-model="form.name"
             placeholder="仓库名称只支持中、英文、数字、下划线(_)、中划线(-)和点(.)的组合"
             :maxlength="100"
             show-word-limit
@@ -102,21 +106,19 @@ const resetForm = () => {
       </el-form-item>
 
       <el-form-item label="初始化仓库">
-        <el-checkbox-group v-model="form.initOptions">
-          <el-checkbox label="readme">生成 README 文件</el-checkbox>
-          <el-checkbox label="gitignore">添加 .gitignore 文件</el-checkbox>
-          <el-checkbox label="branchModel"
-            >添加分支模型（仓库创建后将根据所选模型创建分支）</el-checkbox
-          >
-        </el-checkbox-group>
+        <el-checkbox v-model="form.auto_init">生成 README 文件</el-checkbox>
+        <el-checkbox v-model="isGitignore">添加 .gitignore 文件</el-checkbox>
+        <el-checkbox value="branchModel">
+          添加分支模型（仓库创建后将根据所选模型创建分支）
+        </el-checkbox>
       </el-form-item>
 
       <el-form-item label="是否开源">
-        <el-radio-group v-model="form.isPublic">
-          <el-radio :label="false"
-            >私有仓库（仅对仓库成员可见，仓库成员可访问仓库。）</el-radio
-          >
-          <el-radio :label="true">公开仓库</el-radio>
+        <el-radio-group v-model="form.private">
+          <el-radio :value="true">
+            私有仓库（仅对仓库成员可见，仓库成员可访问仓库。）
+          </el-radio>
+          <el-radio :value="false" disabled>公开仓库</el-radio>
         </el-radio-group>
       </el-form-item>
 
