@@ -31,7 +31,7 @@ const handleLogin = async () => {
   const res = await postOAuthTokenAPI(form.value)
   userStore.setProfile(res)
   ElMessage.success('登录成功')
-  setTimeout(() => router.push('/'), 1500)
+  setTimeout(() => router.push('/'), 1000)
 }
 </script>
 <template>
