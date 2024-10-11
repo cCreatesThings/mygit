@@ -27,7 +27,7 @@ request.interceptors.response.use(
   },
   (err) => {
     // 401处理
-    if (err.response.status === 401) {
+    if (err.response?.status === 401) {
       ElMessage.error('登录过期，请重新登录')
       return Promise.reject(err)
     }

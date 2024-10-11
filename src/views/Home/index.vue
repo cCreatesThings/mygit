@@ -1,6 +1,8 @@
 <script setup>
+import { ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { RouterLink } from 'vue-router'
+import SidebarDrawer from './components/SidebarDrawer.vue'
 
 const sidebarItems = [
   { icon: 'mdi:view-dashboard-outline', label: '工作台', path: '/dashboard' },
@@ -16,8 +18,14 @@ const sidebarItems = [
   { icon: 'mdi:apps', label: '更多', path: '/more' },
   { icon: 'mdi:bell-outline', label: '通知', path: '/notification' },
   { icon: 'mdi:help-circle-outline', label: '帮助', path: '/help' },
-  { icon: 'mdi:account-circle-outline', label: '个人信息', path: '/profile' }
+  {
+    icon: 'mdi:account-circle-outline',
+    label: '个人信息',
+    path: '/profile',
+    drawer: true
+  }
 ]
+const drawer = ref(false)
 </script>
 
 <template>
@@ -28,7 +36,8 @@ const sidebarItems = [
           v-for="(item, index) in sidebarItems"
           :key="index"
           class="sidebar-item"
-          :to="item?.path"
+          :to="item?.path === '/code' ? item?.path : ''"
+          @click="item?.drawer && (drawer = true)"
         >
           <el-tooltip :content="item.label" placement="right">
             <div class="icon-wrapper">
@@ -46,6 +55,7 @@ const sidebarItems = [
         <RouterView />
       </el-main>
     </el-container>
+    <SidebarDrawer :drawer="drawer" @update:drawer="drawer = $event" />
   </el-container>
 </template>
 
@@ -55,7 +65,7 @@ const sidebarItems = [
   margin-bottom: 20px;
   cursor: pointer;
 }
-.router-link-active {
+.router-link-exact-active {
   color: #1890ff;
 }
 

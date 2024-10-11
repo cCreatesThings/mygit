@@ -42,7 +42,6 @@ const paginatedRepositories = ref([])
 // }
 
 const handlePageChange = (val) => {
-  console.log((val - 1) * 5, (val - 1) * 5 + 5)
   paginatedRepositories.value = repositories.value.slice(
     (val - 1) * 5,
     (val - 1) * 5 + 5
@@ -55,9 +54,16 @@ const handleSort = (command) => {
   filters.value.sort = command
   getUserAllRepos()
 }
-watch([() => filters.value.direction, () => filters.value.q], () => {
-  getUserAllRepos()
-})
+watch(
+  [
+    () => filters.value.direction,
+    () => filters.value.q,
+    () => filters.value.visibility
+  ],
+  () => {
+    getUserAllRepos()
+  }
+)
 
 const starRepo = (repo) => {
   ElMessage.success(`Starred repository: ${repo.name}`)

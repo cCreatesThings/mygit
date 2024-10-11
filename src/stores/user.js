@@ -10,8 +10,11 @@ export const useUserStore = defineStore(
       profile.value = data
     }
     const token = computed(() => profile.value.access_token)
-
-    return { profile, setProfile, token }
+    // 清除用户信息
+    const clearProfile = () => {
+      profile.value = {}
+    }
+    return { profile, setProfile, token, clearProfile }
   },
   {
     persist: true
