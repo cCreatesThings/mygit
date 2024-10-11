@@ -96,7 +96,7 @@ const createRepository = () => {
 </script>
 
 <template>
-  <div class="repository-list" v-if="true">
+  <div class="repository-list" v-if="repositories.length">
     <div class="top">
       <div class="filters">
         <el-select v-model="filters.project" placeholder="所属项目" clearable>
