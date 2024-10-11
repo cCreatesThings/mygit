@@ -1,7 +1,7 @@
 <script setup>
 import png from '@/assets/images/4.png'
 import { useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { ElMessage } from 'element-plus'
 import { getUserAllReposAPI } from '@/api/repo'
@@ -9,7 +9,10 @@ import { getUserAllReposAPI } from '@/api/repo'
 const filters = ref({
   project: '',
   visibility: 'all',
-  archived: ''
+  archived: '',
+  sort: 'full_name',
+  direction: 'asc', //升序asc, 降序 desc
+  q: '' //搜索关键字
   // per_page: 10,
   // page: 1
 })
@@ -21,9 +24,9 @@ const getUserAllRepos = async () => {
 }
 getUserAllRepos()
 // 点击搜索
-const search = () => {
-  console.log(filters.value)
-}
+// const search = () => {
+//   console.log(filters.value)
+// }
 
 const repositories = ref([
   // Add more repository data as needed
@@ -49,7 +52,12 @@ const handlePageChange = (val) => {
 const handleSort = (command) => {
   ElMessage.success(`Sorting by ${command}`)
   // Implement sorting logic here
+  filters.value.sort = command
+  getUserAllRepos()
 }
+watch([() => filters.value.direction, () => filters.value.q], () => {
+  getUserAllRepos()
+})
 
 const starRepo = (repo) => {
   ElMessage.success(`Starred repository: ${repo.name}`)
@@ -91,12 +99,13 @@ const createRepository = () => {
           <el-option label="已归档" value="true"></el-option>
           <el-option label="未归档" value="false"></el-option>
         </el-select>
-        <el-button @click="search">
+        <el-input v-model="filters.q" placeholder="搜索关键字" />
+        <!-- <el-button @click="search">
           <template #icon>
             <Icon icon="mdi:magnify" />
           </template>
           搜索
-        </el-button>
+        </el-button> -->
       </div>
 
       <div class="table-header">
@@ -109,14 +118,27 @@ const createRepository = () => {
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="name">仓库名称</el-dropdown-item>
-                <el-dropdown-item command="project">所属项目</el-dropdown-item>
-                <el-dropdown-item command="updatedAt"
-                  >更新时间</el-dropdown-item
-                >
+                <el-dropdown-item command="full_name">
+                  仓库名称
+                </el-dropdown-item>
+                <el-dropdown-item command="created">创建时间</el-dropdown-item>
+                <el-dropdown-item command="updated">更新时间</el-dropdown-item>
+                <el-dropdown-item command="pushed">
+                  最后推送时间
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
+          <Icon
+            icon="ri:sort-asc"
+            @click="filters.direction = 'asc'"
+            v-if="filters.direction === 'desc'"
+          />
+          <Icon
+            icon="ci:sort-ascending"
+            @click="filters.direction = 'desc'"
+            v-else
+          />
         </div>
       </div>
     </div>
