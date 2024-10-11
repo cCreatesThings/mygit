@@ -1,5 +1,8 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const request = axios.create({
   baseURL: 'https://gitee.com',
   timeout: 5000
@@ -29,6 +32,8 @@ request.interceptors.response.use(
     // 401处理
     if (err.response?.status === 401) {
       ElMessage.error('登录过期，请重新登录')
+      useUserStore().clearProfile()
+      router.push('/login')
       return Promise.reject(err)
     }
     ElMessage.error(err.response.data.error_description || '业务异常')
