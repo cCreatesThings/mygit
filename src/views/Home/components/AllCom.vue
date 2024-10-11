@@ -1,7 +1,7 @@
 <script setup>
 import png from '@/assets/images/4.png'
 import { useRouter } from 'vue-router'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { ElMessage } from 'element-plus'
 import { getUserAllReposAPI } from '@/api/repo'
@@ -15,6 +15,15 @@ const filters = ref({
   q: '' //搜索关键字
   // per_page: 10,
   // page: 1
+})
+const sortLabel = computed(() => {
+  return filters.value.sort === 'full_name'
+    ? '仓库名称'
+    : filters.value.sort === 'created'
+      ? '创建时间'
+      : filters.value.sort === 'updated'
+        ? '更新时间'
+        : '最后推送时间'
 })
 // 首次进入页面, 获取全部仓库
 const getUserAllRepos = async () => {
@@ -119,7 +128,7 @@ const createRepository = () => {
           <span>排序字段</span>
           <el-dropdown @command="handleSort">
             <span class="el-dropdown-link">
-              仓库名称
+              {{ sortLabel }}
               <Icon icon="mdi:chevron-down" />
             </span>
             <template #dropdown>
